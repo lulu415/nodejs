@@ -13,8 +13,6 @@ let fs = require('fs')
 let logPath = argv.log && path.join(__dirname, argv.log)
 let logStream = logPath ? fs.createWriteStream(logPath) : process.stdout
 
-console.log(destinationUrl)
-
 
 http.createServer((req, res) => {
     console.log(`Request received at: ${req.url}`)
@@ -22,7 +20,7 @@ http.createServer((req, res) => {
     res.setHeader(header, req.headers[header])
     }
     req.pipe(res)
-    process.stdout.write('\n\n\n' + JSON.stringify(req.headers))
+    logStream.write('Request headers: ' + JSON.stringify(req.headers))
     req.pipe(logStream, {end: false})
 }).listen(8000)
 
@@ -38,6 +36,8 @@ http.createServer((req, res) => {
     process.stdout.write(JSON.stringify(downstreamResponse.headers))
     downstreamResponse.pipe(process.stdout)
     downstreamResponse.pipe(res)
+    logStream.write('Request headers: ' + JSON.stringify(req.headers))
+    req.pipe(logStream, {end: false})
 
 }).listen(8001)
 
